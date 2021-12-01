@@ -6,8 +6,18 @@ public class Day1 {
     public static void main(String[] args) throws FileNotFoundException {
         File file = new File("input1.txt");
         Scanner scanner = new Scanner(file);
-        //System.out.println(standardInput(scanner));
-        System.out.println(slidingWindow(scanner));
+        Scanner sc = new Scanner(System.in);
+        System.out.println("""
+                Please enter a mode:
+                1: Part 1
+                2: Part 2""");
+        switch (sc.nextInt()) {
+            case 1 -> System.out.println(standardInput(scanner));
+            case 2 -> System.out.println(slidingWindow(scanner));
+            default -> System.out.println("Invalid input, please rerun and fill in a valid index.");
+        }
+
+
     }
 
     public static int standardInput(Scanner scanner) {
@@ -33,7 +43,7 @@ public class Day1 {
             if (current + prev + prevPrev > prev + prevPrev + prevPrevPrev) {
                 count++;
             }
-            System.out.println(prev + " " + prevPrev + " " + prevPrevPrev);
+            //System.out.println(prev + " " + prevPrev + " " + prevPrevPrev);
             prevPrevPrev = prevPrev;
             prevPrev = prev;
             prev = current;
