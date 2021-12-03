@@ -12,15 +12,15 @@ public class Day1 {
                 1: Part 1
                 2: Part 2""");
         switch (sc.nextInt()) {
-            case 1 -> System.out.println(standardInput(scanner));
-            case 2 -> System.out.println(slidingWindow(scanner));
+            case 1 -> System.out.println(part1(scanner));
+            case 2 -> System.out.println(part2(scanner));
             default -> System.out.println("Invalid input, please rerun and fill in a valid index.");
         }
 
 
     }
 
-    public static int standardInput(Scanner scanner) {
+    public static int part1(Scanner scanner) {
         int prev = Integer.MAX_VALUE;
         int count = 0;
         while (scanner.hasNextLine()) {
@@ -33,7 +33,7 @@ public class Day1 {
         return count;
     }
 
-    public static int slidingWindow(Scanner scanner) {
+    public static int part2(Scanner scanner) {
         int prev = 8500;
         int prevPrev = 8500;
         int prevPrevPrev = 8500;
