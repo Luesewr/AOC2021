@@ -16,8 +16,6 @@ public class Day1 {
             case 2 -> System.out.println(part2(scanner));
             default -> System.out.println("Invalid input, please rerun and fill in a valid index.");
         }
-
-
     }
 
     public static int part1(Scanner scanner) {
