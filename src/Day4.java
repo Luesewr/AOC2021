@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class Day4 {
     public static void main(String[] args) throws FileNotFoundException {
@@ -25,42 +24,32 @@ public class Day4 {
     private static int part1(Scanner scanner) {
         List<Integer> numbers = new ArrayList<>();
         Arrays.stream(scanner.nextLine().split(",")).toList().forEach(s -> numbers.add(Integer.parseInt(s)));
-
+        List<BingoCard> boards = new ArrayList<>();
         List<String> lines = new ArrayList<>();
-        int boards = 0;
         while (scanner.hasNextLine()) {
             String line = scanner.nextLine();
             if (line.length() > 1)
                 lines.add(line);
-            else
-                boards++;
         }
-        int[][][] grid = new int[boards][5][5];
-        boolean[][][] truthGrid = new boolean[boards][5][5];
-        AtomicInteger i = new AtomicInteger(0);
-        AtomicInteger j = new AtomicInteger(0);
-        lines.forEach(s -> {
-            grid[i.get()][j.get() % 5] = Arrays.stream(lines.get(j.get()).trim().split("[ ]+")).mapToInt(Integer::parseInt).toArray();
-            j.getAndIncrement();
-            if (j.get() % 5 == 0) {
-                i.getAndIncrement();
+        int i = 0;
+        for (int j = 0; j < lines.size() / 5; j++) {
+            BingoCard bingoCard = new BingoCard();
+            for (int k = 0; k < 5; k++, i++) {
+                bingoCard.setGridRow(k, Arrays.stream(lines.get(i).trim().split("[ ]+")).mapToInt(Integer::parseInt).toArray());
             }
-        });
+            boards.add(bingoCard);
+        }
         for (Integer integer : numbers) {
-            for (int k = 0; k < grid.length; k++) {
+            for (BingoCard bingoCard : boards) {
                 for (int l = 0; l < 5; l++) {
                     for (int m = 0; m < 5; m++) {
-                        if (grid[k][l][m] == integer) {
-                            truthGrid[k][l][m] = true;
-                            if (checkWin(truthGrid[k])) {
+                        if (bingoCard.getInt(l, m) == integer) {
+                            bingoCard.setTruth(l, m);
+                            if (bingoCard.checkWin()) {
+                                bingoCard.setWinningScore(integer);
                                 System.out.println(integer + ", ");
-                                for (int n = 0; n < 5; n++) {
-                                    System.out.println(Arrays.toString(grid[k][n]));
-                                }
-                                for (int n = 0; n < 5; n++) {
-                                    System.out.println(Arrays.toString(truthGrid[k][n]));
-                                }
-                                return integer * sumBoard(grid[k], truthGrid[k]);
+                                bingoCard.print();
+                                return bingoCard.getScore();
                             }
                         }
                     }
@@ -73,40 +62,33 @@ public class Day4 {
     private static int part2(Scanner scanner) {
         List<Integer> numbers = new ArrayList<>();
         Arrays.stream(scanner.nextLine().split(",")).toList().forEach(s -> numbers.add(Integer.parseInt(s)));
-
+        List<BingoCard> boards = new ArrayList<>();
         List<String> lines = new ArrayList<>();
-        int boards = 0;
         while (scanner.hasNextLine()) {
             String line = scanner.nextLine();
             if (line.length() > 1)
                 lines.add(line);
-            else
-                boards++;
         }
-        int[][][] grid = new int[boards][5][5];
-        boolean[][][] truthGrid = new boolean[boards][5][5];
-        int[] winningScore = new int[boards];
-        AtomicInteger i = new AtomicInteger(0);
-        AtomicInteger j = new AtomicInteger(0);
-        lines.forEach(s -> {
-            grid[i.get()][j.get() % 5] = Arrays.stream(lines.get(j.get()).trim().split("[ ]+")).mapToInt(Integer::parseInt).toArray();
-            j.getAndIncrement();
-            if (j.get() % 5 == 0) {
-                i.getAndIncrement();
+        int i = 0;
+        for (int j = 0; j < lines.size() / 5; j++) {
+            BingoCard bingoCard = new BingoCard();
+            for (int k = 0; k < 5; k++, i++) {
+                bingoCard.setGridRow(k, Arrays.stream(lines.get(i).trim().split("[ ]+")).mapToInt(Integer::parseInt).toArray());
             }
-        });
-        int lastWinner = -1;
+            boards.add(bingoCard);
+        }
+        BingoCard lastWinner = new BingoCard();
         int winners = 0;
         for (Integer integer : numbers) {
-            for (int k = 0; winners < boards && k < grid.length; k++) {
-                for (int l = 0; winners < boards &&  l < 5; l++) {
-                    for (int m = 0; winners < boards &&  m < 5; m++) {
-                        if (grid[k][l][m] == integer) {
-                            boolean wonAlready = checkWin(truthGrid[k]);
-                            truthGrid[k][l][m] = true;
-                            if (!wonAlready && checkWin(truthGrid[k])) {
-                                winningScore[k] = integer;
-                                lastWinner = k;
+            for (BingoCard bingoCard : boards) {
+                for (int l = 0; winners < boards.size() && l < 5; l++) {
+                    for (int m = 0; winners < boards.size() && m < 5; m++) {
+                        if (bingoCard.getInt(l, m) == integer) {
+                            boolean wonAlready = bingoCard.checkWin();
+                            bingoCard.setTruth(l, m);
+                            if (!wonAlready && bingoCard.checkWin()) {
+                                bingoCard.setWinningScore(integer);
+                                lastWinner = bingoCard;
                                 winners++;
                             }
                         }
@@ -114,43 +96,82 @@ public class Day4 {
                 }
             }
         }
-        for (int n = 0; n < 5; n++) {
-            System.out.println(Arrays.toString(grid[lastWinner][n]));
-        }
-        for (int n = 0; n < 5; n++) {
-            System.out.println(Arrays.toString(truthGrid[lastWinner][n]));
-        }
-        System.out.println(winningScore[lastWinner] + ", " + sumBoard(grid[lastWinner], truthGrid[lastWinner]));
-        return winningScore[lastWinner] * sumBoard(grid[lastWinner], truthGrid[lastWinner]);
+        lastWinner.print();
+        System.out.println(lastWinner.getWinningScore() + ", " + lastWinner.sumBoard());
+        return lastWinner.getScore();
     }
 
-    private static int sumBoard(int[][] ints, boolean[][] booleans) {
-        int total = 0;
-        for (int i = 0; i < 5; i++) {
-            for (int j = 0; j < 5; j++) {
-                if (!booleans[i][j]) {
-                    total += ints[i][j];
+    static class BingoCard {
+        private final int[][] grid;
+        private final boolean[][] truthGrid;
+        private int winningScore;
+
+        public BingoCard() {
+            grid = new int[5][5];
+            truthGrid = new boolean[5][5];
+        }
+
+        private boolean checkWin() {
+            for (int i = 0; i < 5; i++) {
+                boolean horWin = true;
+                boolean verWin = true;
+                for (int j = 0; j < 5; j++) {
+                    if (!truthGrid[i][j])
+                        horWin = false;
+                    if (!truthGrid[j][i])
+                        verWin = false;
+                }
+                if (horWin)
+                    return true;
+                if (verWin)
+                    return true;
+            }
+            return false;
+        }
+
+        private int sumBoard() {
+            int total = 0;
+            for (int i = 0; i < 5; i++) {
+                for (int j = 0; j < 5; j++) {
+                    if (!truthGrid[i][j]) {
+                        total += grid[i][j];
+                    }
                 }
             }
+            return total;
         }
-        return total;
-    }
 
-    private static boolean checkWin(boolean[][] grid) {
-        for (int i = 0; i < 5; i++) {
-            boolean horWin = true;
-            boolean verWin = true;
-            for (int j = 0; j < 5; j++) {
-                if (!grid[i][j])
-                    horWin = false;
-                if (!grid[j][i])
-                    verWin = false;
-            }
-            if (horWin)
-                return true;
-            if (verWin)
-                return true;
+        public int getInt(int i, int j) {
+            return grid[i][j];
         }
-        return false;
+
+        public int getScore() {
+            return winningScore * sumBoard();
+        }
+
+        public int getWinningScore() {
+            return winningScore;
+        }
+
+        public void setWinningScore(int score) {
+            winningScore = score;
+        }
+
+        public void setGridRow(int i, int[] value) {
+            grid[i] = value;
+        }
+
+        public void setTruth(int i, int j) {
+            truthGrid[i][j] = true;
+        }
+
+        public void print() {
+            for (int n = 0; n < 5; n++) {
+                System.out.println(Arrays.toString(grid[n]));
+            }
+            for (int n = 0; n < 5; n++) {
+                System.out.println(Arrays.toString(truthGrid[n]));
+            }
+        }
     }
 }
