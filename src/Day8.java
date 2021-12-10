@@ -101,18 +101,15 @@ public class Day8 {
                     case 7 -> content[8] = s(s);
                 }
             }
-            System.out.println(Arrays.toString(content));
             String number = "";
             for (String d : digits.get(count).split(" ")) {
                 for (int i = 0; i < content.length; i++) {
-                    //System.out.printf("%s, %s\n", s(d), content[i]);
                     if (s(d).equals(content[i])) {
                         number += String.valueOf(i);
                         break;
                     }
                 }
             }
-            System.out.println(number);
             total += Integer.parseInt(number);
             count++;
         }
