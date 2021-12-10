@@ -80,13 +80,10 @@ public class Day10 {
                 }
             }
             if (!broken) {
-                System.out.println(check);
                 for (int i = check.length() - 1; i >= 0; i--) {
                     total *= 5;
-                    System.out.println(autocompleteValues.get(check.charAt(i)));
                     total += autocompleteValues.get(check.charAt(i));
                 }
-                System.out.println(total);
                 scores.add(total);
             }
         }
